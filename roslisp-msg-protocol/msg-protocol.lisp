@@ -98,6 +98,29 @@ As a base case, non-ros messages just return themselves."))
        )
     ))
 
+(defun code-symbols (msg-type code)
+  "Retrieves the list of symbol-code associations which contain 'code' for 'msg-type'.
+
+ For example, if my_msgs/Log.msg has defined the constants DEBUG=1, WARN=2, ERROR=1,
+ you can get all code-symbol associations with constant code 1 with:
+
+ ROSLISP-MSG-PROTOCOL> (code-symbols 'my_msgs-msg:log 1)
+   ((:DEBUG . 1) (:ERROR . 1))"
+  (remove code (roslisp-msg-protocol:symbol-codes msg-type) :test-not #'= :key #'rest))
+
+(defun code-symbol (msg-type code)
+  "Retrieves the first symbol associated with the constant 'code' in the symbol codes of
+ 'msg-type'.
+
+ For example, if my_msgs/Log.msg has defined the constants DEBUG=1, WARN=2, ERROR=1, you
+ can get the first symbol associated with the constant code 1 with:
+
+ ROSLISP-MSG-PROTOCOL> (code-symbol 'my_msgs-msg:log 1)
+   :DEBUG"
+  (let ((symbol-codes (code-symbols msg-type code)))
+    (when symbol-codes
+      (caar symbol-codes))))
+
 ;; datatype functions for string arguments
 
 (defun string-to-ros-msgtype-symbol (msg-type)
